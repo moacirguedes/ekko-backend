@@ -1,0 +1,48 @@
+networks:
+  ekko:
+
+volumes:
+  local_pgdata:
+
+services:
+  app:
+    container_name: "frankenphp"
+    build:
+      context: .
+      dockerfile: ./dockerfiles/frankenphp.dockerfile
+    ports:
+      - "9804:9804"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    networks:
+      - ekko
+    command: >
+      sh -c "
+        composer install &&
+        php artisan octane:start --server=frankenphp --port=9804 --host=0.0.0.0
+      "
+
+  db:
+    image: postgres
+    tty: true
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+      POSTGRES_DB: "ekko"
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+    networks:
+      - ekko
+
+  adminer:
+    image: adminer
+    depends_on:
+      - db
+    networks:
+      - ekko
+    ports:
+      - "8075:8080"
