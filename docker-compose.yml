@@ -18,13 +18,9 @@ services:
       - db
     networks:
       - ekko
-    command: >
-      sh -c "
-        composer install &&
-        php artisan octane:start --server=frankenphp --port=9804 --host=0.0.0.0
-      "
 
   db:
+    container_name: "postgres"
     image: postgres
     tty: true
     ports:
@@ -39,6 +35,7 @@ services:
       - ekko
 
   adminer:
+    container_name: "adminer"
     image: adminer
     depends_on:
       - db
@@ -46,3 +43,12 @@ services:
       - ekko
     ports:
       - "8075:8080"
+
+  mailpit:
+    container_name: "mailpit"
+    image: axllent/mailpit
+    networks:
+      - ekko
+    ports:
+      - "1025:1025"
+      - "8025:8025"

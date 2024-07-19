@@ -14,4 +14,4 @@ RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoload
 
 RUN chown -R www-data:www-data /app
 
-ENTRYPOINT ["sh", "-c", "composer install && php artisan octane:start --server=frankenphp --port=9804 --host=0.0.0.0"]
+ENTRYPOINT ["sh", "-c", "composer update && php artisan octane:start --server=frankenphp --port=9804 --host=0.0.0.0"]
