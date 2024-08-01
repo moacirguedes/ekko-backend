@@ -3,6 +3,7 @@ networks:
 
 volumes:
   local_pgdata:
+  redis_data:
 
 services:
   app:
@@ -10,12 +11,19 @@ services:
     build:
       context: .
       dockerfile: ./dockerfiles/frankenphp.dockerfile
+      args:
+        UID: "1000"
+        GID: "1000"
     ports:
-      - "9804:9804"
+      - "8000:8000"
     volumes:
-      - .:/app
+      - .:/var/www/html:cached
+      - ./vendor:/var/www/html/vendor:cached
+      - ./storage:/var/www/html/storage:cached
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache:cached
     depends_on:
       - db
+      - redis
     networks:
       - ekko
 
@@ -52,3 +60,13 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
+
+  redis:
+    container_name: "redis"
+    image: redis:alpine
+    networks:
+      - ekko
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
